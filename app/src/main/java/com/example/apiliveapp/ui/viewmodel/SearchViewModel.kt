@@ -24,6 +24,9 @@ class SearchViewModel : ViewModel() {
     private val _apiState : MutableStateFlow<ApiState> = MutableStateFlow(ApiState.SUCCESS)
     val apiState = _apiState.asStateFlow()
 
+    private val _errorMessage : MutableStateFlow<String> = MutableStateFlow("")
+    val errorMessage = _errorMessage.asStateFlow()
+
     fun search(newSearchTerm : String) {
         _searchTerm.value = newSearchTerm
 
@@ -33,15 +36,24 @@ class SearchViewModel : ViewModel() {
         viewModelScope.launch {
 
             try {
-                val result = OpenLibraryApi.apiService.searchBooks(newSearchTerm)
+                val response = OpenLibraryApi.apiService.searchBooks(newSearchTerm)
 
-                //Daten "auspacken"
-                _searchResults.value = result.docs
 
-                //Nachdem der API Call erfolgreich ausgeführt
-                _apiState.value = ApiState.SUCCESS
+                if(response.isSuccessful) {
+                    //Daten "auspacken"
+                    _searchResults.value = response.body()!!.docs
+
+                    //Nachdem der API Call erfolgreich ausgeführt
+                    _apiState.value = ApiState.SUCCESS
+
+                } else {
+                    Log.e("SearchViewModel", "Fehler beim API Call, Status Code: ${response.code()}", )
+                    _errorMessage.value = "Fehler beim API Call, Status Code: ${response.code()}"
+                    _apiState.value = ApiState.ERROR
+                }
             } catch (ex: Exception) {
                 Log.e("SearchViewModel", ex.toString())
+                _errorMessage.value = ex.toString()
                 _apiState.value = ApiState.ERROR
             }
         }

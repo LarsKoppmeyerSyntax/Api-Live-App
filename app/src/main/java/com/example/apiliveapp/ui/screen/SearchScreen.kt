@@ -19,6 +19,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.apiliveapp.ui.component.BookItem
 import com.example.apiliveapp.ui.viewmodel.ApiState
 import com.example.apiliveapp.ui.viewmodel.SearchViewModel
 
@@ -31,7 +32,7 @@ fun SearchScreen(
     val searchFieldValue by viewModel.searchTerm.collectAsState()
     val searchResult by viewModel.searchResult.collectAsState()
     val apiState by viewModel.apiState.collectAsState()
-
+    val errorMessage by viewModel.errorMessage.collectAsState()
 
 
     Column(
@@ -47,36 +48,39 @@ fun SearchScreen(
             }
         )
 
-        AnimatedVisibility(apiState == ApiState.LOADING) {
-
-            CircularProgressIndicator(
-                modifier = Modifier.fillMaxSize()
-            )
-
-        }
-
-        AnimatedVisibility(apiState == ApiState.ERROR) {
-
-            Text(
-                text = "Api Fehler!",
-                color = Color.Red
-            )
-
-        }
-
-        AnimatedVisibility(apiState == ApiState.SUCCESS) {
-            LazyColumn(
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                items(searchResult) { book ->
-                    Text(
-                        text = book.title,
-                        fontSize = 20.sp,
-                        modifier = Modifier.padding(4.dp)
-                    )
+        when (apiState) {
+            ApiState.SUCCESS -> {
+                LazyColumn(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    items(searchResult) { book ->
+                        BookItem(
+                            modifier = Modifier.padding(4.dp),
+                            book = book
+                        )
+                    }
                 }
             }
+            ApiState.LOADING -> {
+                CircularProgressIndicator(
+                    modifier = Modifier.fillMaxSize()
+                )
+            }
+            ApiState.ERROR -> {
+                Text(
+                    text = errorMessage,
+                    color = Color.Red
+                )
+            }
         }
+
+
+
+
+
+
+
+
     }
 
 
