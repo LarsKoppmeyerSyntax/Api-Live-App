@@ -3,6 +3,7 @@ package com.example.apiliveapp.ui.viewmodel
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.apiliveapp.BuildConfig
 import com.example.apiliveapp.data.api.OpenLibraryApi
 import com.example.apiliveapp.data.model.Book
 import kotlinx.coroutines.flow.MutableStateFlow
