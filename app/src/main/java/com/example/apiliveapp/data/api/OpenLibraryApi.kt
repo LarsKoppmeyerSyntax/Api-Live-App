@@ -43,6 +43,8 @@ interface OpenLibraryApiService {
     @GET("search.json")
     suspend fun searchBooks(
         @Query("q") searchTerm: String,
+        @Query("offset") offset: Int = 0,
+        @Query("limit") limit: Int = 20,
         @Header("User-Agent") userAgentHeader: String = "API_Live_App/0.1 ($email)",
     ): Response<BookSearchResponse>
 
